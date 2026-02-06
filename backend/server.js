@@ -1,15 +1,11 @@
-import express from 'express';
-
+const express = require('express');
+const dotenv = require('dotenv').config();
 const app = express();
-const PORT = process.env.PORT;
+
+const PORT = process.env.PORT||5000;
 
 app.use(express.json());
-
-
-app.get('/', (req, res) => {
-  res.send('Dental Appointment System Backend is running');
-});
-
+app.use('/dental', require('./routes/dentalroute'));
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
