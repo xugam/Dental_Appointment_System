@@ -16,6 +16,13 @@ const patientsSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      validate: {
+        validator: function(v) {
+          const digitsOnly = v.replace(/\D/g, '');
+          return digitsOnly.length === 10;
+        },
+        message: 'Phone number must be exactly 10 digits'
+      }
     },
     address: {
       type: String,

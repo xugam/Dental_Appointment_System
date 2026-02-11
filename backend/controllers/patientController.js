@@ -14,6 +14,16 @@ const getPatients = async (req, res) => {
 const createPatient = async (req, res) => {
   try {
     const { name, email, phone, address } = req.body;
+    
+    // Validate phone number (exactly 10 digits)
+    if (!phone) {
+      return res.status(400).json({ message: 'Phone is required' });
+    }
+    const digitsOnly = phone.toString().replace(/\D/g, '');
+    if (digitsOnly.length !== 10) {
+      return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
+    }
+    
     const patient = new Patient({ name, email, phone, address });
     await patient.save().then(patient => res.status(201).json(patient))
     .catch(err => res.status(400).json({ message: err.message }));
@@ -36,6 +46,14 @@ const getPatientById = async (req, res) => {
 
 const updatePatient = async (req, res) => {
   try{
+    // Validate phone number if provided
+    if (req.body.phone !== undefined) {
+      const digitsOnly = req.body.phone.toString().replace(/\D/g, '');
+      if (digitsOnly.length !== 10) {
+        return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
+      }
+    }
+    
     const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
     
     if(!patient){

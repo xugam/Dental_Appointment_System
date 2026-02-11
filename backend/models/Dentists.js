@@ -19,7 +19,13 @@ const dentistsSchema = new mongoose.Schema(
     phone: {
         type: Number,
         required: true,
-        trim: true,
+        validate: {
+          validator: function(v) {
+            const digitsOnly = v.toString().replace(/\D/g, '');
+            return digitsOnly.length === 10;
+          },
+          message: 'Phone number must be exactly 10 digits'
+        }
     }
   },
   { timestamps: true }

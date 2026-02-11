@@ -14,7 +14,17 @@ const getDentists = async (req, res) => {
 const createDentist = async (req, res) => {
   try {
     const { name, specialization, experience, phone } = req.body;
-    const dentist = new Dentists({ name, specialization, experience, phone });
+    
+    // Validate phone number (exactly 10 digits)
+    if (!phone) {
+      return res.status(400).json({ message: 'Phone is required' });
+    }
+    const digitsOnly = phone.toString().replace(/\D/g, '');
+    if (digitsOnly.length !== 10) {
+      return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
+    }
+    
+    const dentist = new Dentists({ name, specialization, experience, phone: Number(digitsOnly) });
     await dentist.save().then(dentist => res.status(201).json(dentist))
     .catch(err => res.status(400).json({ message: err.message }));
   } catch (error) {
@@ -36,6 +46,15 @@ const getDentistById = async (req, res) => {
 
             const updateDentist = async (req, res) => {
   try{
+    // Validate phone number if provided
+    if (req.body.phone !== undefined) {
+      const digitsOnly = req.body.phone.toString().replace(/\D/g, '');
+      if (digitsOnly.length !== 10) {
+        return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
+      }
+      req.body.phone = Number(digitsOnly);
+    }
+    
     const dentist = await Dentists.findByIdAndUpdate(req.params.id, req.body, { new: true });
     
     if(!dentist){
